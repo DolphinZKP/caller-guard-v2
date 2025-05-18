@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import Select, { SingleValue } from 'react-select';
+import dynamic from 'next/dynamic';
 import { useAgentContext } from '@/context/AgentContext';
 import type { Agent } from '@/utils/agents';
+
+const Select = dynamic(() => import('react-select'), { ssr: false });
 
 function generateOtp() {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -64,8 +66,8 @@ export default function AgentDashboardPage() {
       <div className="mt-8">
         <h2 className="text-xl font-semibold mb-2">Instructions for Customer</h2>
         <ol className="list-decimal ml-6">
-          <li>Open the authenticator app</li>
-          <li>Enter the code above</li>
+          <li>Open the authenticator app, enter the bank name and the rep_ID</li>
+          <li>Enter the 6 code. They have 1 minute to do so.</li>
           <li>Complete the verification process</li>
         </ol>
       </div>

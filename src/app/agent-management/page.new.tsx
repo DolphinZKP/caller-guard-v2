@@ -6,6 +6,7 @@ import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
 import type { AgGridReact as AgGridReactType } from "ag-grid-react";
 import type { ColDef, ICellRendererParams, ValueGetterParams } from "ag-grid-community";
 import { useAgentContext } from '@/context/AgentContext';
+import dynamic from 'next/dynamic';
 
 // Register AG Grid modules
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -37,37 +38,7 @@ const enabledColumnDefs: ColDef[] = [
     headerName: "Actions",
     field: "actions",
     flex: 1,
-    cellRenderer: (params: ICellRendererParams) => {
-      const [isExpanded, setIsExpanded] = useState(false);
-      const { revokeAgent } = useAgentContext();
-      return (
-        <div>
-          <button
-            className="px-2 py-1 bg-blue-100 rounded"
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
-            {isExpanded ? "Hide Details" : "View Details"}
-          </button>
-          {isExpanded && (
-            <div className="mt-2 p-4 bg-gray-50 rounded border">
-              <h3 className="font-bold mb-2">Agent Details</h3>
-              <div className="grid grid-cols-2 gap-2">
-                <div><strong>Name:</strong> {params.data.name}</div>
-                <div><strong>Username:</strong> {params.data.username}</div>
-                <div><strong>Rep ID:</strong> {params.data.repId}</div>
-                <div><strong>Department:</strong> {params.data.department}</div>
-                <div><strong>Permissions:</strong></div>
-                <div>
-                  <div>• Open Accounts: {params.data.permissions.open ? "✅" : "❌"}</div>
-                  <div>• Take Payments: {params.data.permissions.pay ? "✅" : "❌"}</div>
-                </div>
-              </div>
-              <button className="px-4 py-2 bg-red-500 text-white rounded mt-4" onClick={() => revokeAgent(params.data.repId)}>Revoke Agent Access</button>
-            </div>
-          )}
-        </div>
-      );
-    },
+    cellRenderer: (params: ICellRendererParams) => <AgentActionsCell data={params.data} />,
     cellClass: "ag-left-aligned-cell",
   },
 ];
@@ -94,41 +65,79 @@ const allEmployeesColumnDefs: ColDef[] = [
     headerName: "Actions",
     field: "actions",
     flex: 1,
-    cellRenderer: (params: ICellRendererParams) => {
-      const [isExpanded, setIsExpanded] = useState(false);
-      const { revokeAgent } = useAgentContext();
-      return (
-        <div>
-          <button
-            className="px-2 py-1 bg-blue-100 rounded"
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
-            {isExpanded ? "Hide Details" : "View Details"}
-          </button>
-          {isExpanded && (
-            <div className="mt-2 p-4 bg-gray-50 rounded border">
-              <h3 className="font-bold mb-2">Employee Details</h3>
-              <div className="grid grid-cols-2 gap-2">
-                <div><strong>Name:</strong> {params.data.name}</div>
-                <div><strong>Username:</strong> {params.data.username}</div>
-                <div><strong>Rep ID:</strong> {params.data.repId}</div>
-                <div><strong>Department:</strong> {params.data.department}</div>
-                <div><strong>Status:</strong> {params.data.enabled ? "Enabled" : "Disabled"}</div>
-                <div><strong>Permissions:</strong></div>
-                <div>
-                  <div>• Open Accounts: {params.data.permissions.open ? "✅" : "❌"}</div>
-                  <div>• Take Payments: {params.data.permissions.pay ? "✅" : "❌"}</div>
-                </div>
-              </div>
-              <button className="px-4 py-2 bg-red-500 text-white rounded mt-4" onClick={() => revokeAgent(params.data.repId)}>Revoke Agent Access</button>
-            </div>
-          )}
-        </div>
-      );
-    },
+    cellRenderer: (params: ICellRendererParams) => <EmployeeActionsCell data={params.data} />,
     cellClass: "ag-left-aligned-cell",
   },
 ];
+
+// Cell renderer for enabled agents
+function AgentActionsCell({ data }: { data: any }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const { revokeAgent } = useAgentContext();
+  return (
+    <div>
+      <button
+        className="px-2 py-1 bg-blue-100 rounded"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        {isExpanded ? "Hide Details" : "View Details"}
+      </button>
+      {isExpanded && (
+        <div className="mt-2 p-4 bg-gray-50 rounded border">
+          <h3 className="font-bold mb-2">Agent Details</h3>
+          <div className="grid grid-cols-2 gap-2">
+            <div><strong>Name:</strong> {data.name}</div>
+            <div><strong>Username:</strong> {data.username}</div>
+            <div><strong>Rep ID:</strong> {data.repId}</div>
+            <div><strong>Department:</strong> {data.department}</div>
+            <div><strong>Permissions:</strong></div>
+            <div>
+              <div>• Open Accounts: {data.permissions.open ? "✅" : "❌"}</div>
+              <div>• Take Payments: {data.permissions.pay ? "✅" : "❌"}</div>
+            </div>
+          </div>
+          <button className="px-4 py-2 bg-red-500 text-white rounded mt-4" onClick={() => revokeAgent(data.repId)}>Revoke Agent Access</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Cell renderer for all employees
+function EmployeeActionsCell({ data }: { data: any }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const { revokeAgent } = useAgentContext();
+  return (
+    <div>
+      <button
+        className="px-2 py-1 bg-blue-100 rounded"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        {isExpanded ? "Hide Details" : "View Details"}
+      </button>
+      {isExpanded && (
+        <div className="mt-2 p-4 bg-gray-50 rounded border">
+          <h3 className="font-bold mb-2">Employee Details</h3>
+          <div className="grid grid-cols-2 gap-2">
+            <div><strong>Name:</strong> {data.name}</div>
+            <div><strong>Username:</strong> {data.username}</div>
+            <div><strong>Rep ID:</strong> {data.repId}</div>
+            <div><strong>Department:</strong> {data.department}</div>
+            <div><strong>Status:</strong> {data.enabled ? "Enabled" : "Disabled"}</div>
+            <div><strong>Permissions:</strong></div>
+            <div>
+              <div>• Open Accounts: {data.permissions.open ? "✅" : "❌"}</div>
+              <div>• Take Payments: {data.permissions.pay ? "✅" : "❌"}</div>
+            </div>
+          </div>
+          <button className="px-4 py-2 bg-red-500 text-white rounded mt-4" onClick={() => revokeAgent(data.repId)}>Revoke Agent Access</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+const ProgramManager = dynamic(() => import('@aleohq/sdk').then(mod => mod.ProgramManager), { ssr: false });
 
 export default function AgentManagementPage() {
   const [tab, setTab] = useState<"enabled" | "all">("enabled");
