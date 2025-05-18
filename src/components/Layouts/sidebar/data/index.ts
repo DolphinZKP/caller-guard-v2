@@ -1,3 +1,5 @@
+"use client";
+
 import * as Icons from "../icons";
 
 export const NAV_DATA = [

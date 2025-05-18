@@ -1,9 +1,12 @@
 "use client";
 
-import React, { useState } from 'react';
-import Select, { SingleValue } from 'react-select';
+import React, { useState, useRef, useEffect } from 'react';
+import dynamic from 'next/dynamic';
+import { SingleValue } from 'react-select';
 import { useAgentContext } from '@/context/AgentContext';
 import type { Agent } from '@/utils/agents';
+
+const Select = dynamic(() => import('react-select'), { ssr: false });
 
 type OptionType = { value: string; label: string };
 
@@ -20,8 +23,8 @@ export default function HrAdminPage() {
 
   const employee = notEnabledAgents.find((a: Agent) => a.repId === selected?.value);
 
-  const handleSelect = (option: SingleValue<OptionType>) => {
-    setSelected(option || null);
+  const handleSelect = (newValue: unknown) => {
+    setSelected(newValue as OptionType | null);
   };
 
   const handleMint = () => {
@@ -29,10 +32,36 @@ export default function HrAdminPage() {
   };
 
   const confirmMint = () => {
-    if (employee) enableAgent(employee.repId);
+    if (employee) {
+      enableAgent(employee.repId);
+      console.log("Sending message to worker:", {
+        type: "mint_agent",
+        rep_id: employee.repId,
+        bank_name: employee.department,
+      });
+      workerRef.current?.postMessage({
+        type: "mint_agent",
+        rep_id: employee.repId,
+        bank_name: employee.department,
+      });
+    }
     setShowConfirm(false);
     setSuccess(employee || null);
   };
+
+  const workerRef = useRef<Worker | null>(null);
+
+  useEffect(() => {
+    // Adjust the path if needed (this assumes worker.ts is in the same folder as your page)
+    workerRef.current = new Worker(new URL("./worker.ts", import.meta.url), { type: "module" });
+    workerRef.current.onmessage = (event) => {
+      if (event.data.type === "mint_agent") {
+        alert(`Minted agent: ${JSON.stringify(event.data.result)}`);
+      }
+    };
+    console.log("Worker script loaded!");
+    return () => workerRef.current?.terminate();
+  }, []);
 
   if (success) {
     return (

@@ -5,6 +5,7 @@ import { agents as initialAgents, Agent } from "@/utils/agents";
 type AgentContextType = {
   agents: Agent[];
   enableAgent: (repId: string) => void;
+  revokeAgent: (repId: string) => void;
 };
 
 const AgentContext = createContext<AgentContextType | undefined>(undefined);
@@ -20,8 +21,16 @@ export function AgentProvider({ children }: { children: ReactNode }) {
     );
   };
 
+  const revokeAgent = (repId: string) => {
+    setAgents(prev =>
+      prev.map(agent =>
+        agent.repId === repId ? { ...agent, enabled: false } : agent
+      )
+    );
+  };
+
   return (
-    <AgentContext.Provider value={{ agents, enableAgent }}>
+    <AgentContext.Provider value={{ agents, enableAgent, revokeAgent }}>
       {children}
     </AgentContext.Provider>
   );

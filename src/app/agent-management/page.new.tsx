@@ -6,8 +6,6 @@ import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
 import type { AgGridReact as AgGridReactType } from "ag-grid-react";
 import type { ColDef, ICellRendererParams, ValueGetterParams } from "ag-grid-community";
 import { agents as allAgents } from "@/utils/agents"; // adjust path as needed
-import AgentDetailsCell from "@/components/AgentDetailsCell";
-import { Account, ProgramManager, AleoNetworkClient, initializeWasm } from '@aleohq/sdk';
 
 // Register AG Grid modules
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -40,14 +38,32 @@ const enabledColumnDefs: ColDef[] = [
     field: "actions",
     flex: 1,
     cellRenderer: (params: ICellRendererParams) => {
-      // We'll handle the details display outside the grid
+      const [isExpanded, setIsExpanded] = useState(false);
       return (
-        <button
-          className="px-2 py-1 bg-blue-100 rounded"
-          onClick={() => params.context.onViewDetails(params.data)}
-        >
-          {params.context.selectedAgent && params.context.selectedAgent.repId === params.data.repId ? "Hide Details" : "View Details"}
-        </button>
+        <div>
+          <button
+            className="px-2 py-1 bg-blue-100 rounded"
+            onClick={() => setIsExpanded(!isExpanded)}
+          >
+            {isExpanded ? "Hide Details" : "View Details"}
+          </button>
+          {isExpanded && (
+            <div className="mt-2 p-4 bg-gray-50 rounded border">
+              <h3 className="font-bold mb-2">Agent Details</h3>
+              <div className="grid grid-cols-2 gap-2">
+                <div><strong>Name:</strong> {params.data.name}</div>
+                <div><strong>Username:</strong> {params.data.username}</div>
+                <div><strong>Rep ID:</strong> {params.data.repId}</div>
+                <div><strong>Department:</strong> {params.data.department}</div>
+                <div><strong>Permissions:</strong></div>
+                <div>
+                  <div>• Open Accounts: {params.data.permissions.open ? "✅" : "❌"}</div>
+                  <div>• Take Payments: {params.data.permissions.pay ? "✅" : "❌"}</div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       );
     },
     cellClass: "ag-left-aligned-cell",
@@ -72,13 +88,48 @@ const allEmployeesColumnDefs: ColDef[] = [
     ),
     cellClass: "ag-left-aligned-cell",
   },
+  {
+    headerName: "Actions",
+    field: "actions",
+    flex: 1,
+    cellRenderer: (params: ICellRendererParams) => {
+      const [isExpanded, setIsExpanded] = useState(false);
+      return (
+        <div>
+          <button
+            className="px-2 py-1 bg-blue-100 rounded"
+            onClick={() => setIsExpanded(!isExpanded)}
+          >
+            {isExpanded ? "Hide Details" : "View Details"}
+          </button>
+          {isExpanded && (
+            <div className="mt-2 p-4 bg-gray-50 rounded border">
+              <h3 className="font-bold mb-2">Employee Details</h3>
+              <div className="grid grid-cols-2 gap-2">
+                <div><strong>Name:</strong> {params.data.name}</div>
+                <div><strong>Username:</strong> {params.data.username}</div>
+                <div><strong>Rep ID:</strong> {params.data.repId}</div>
+                <div><strong>Department:</strong> {params.data.department}</div>
+                <div><strong>Status:</strong> {params.data.enabled ? "Enabled" : "Disabled"}</div>
+                <div><strong>Permissions:</strong></div>
+                <div>
+                  <div>• Open Accounts: {params.data.permissions.open ? "✅" : "❌"}</div>
+                  <div>• Take Payments: {params.data.permissions.pay ? "✅" : "❌"}</div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    },
+    cellClass: "ag-left-aligned-cell",
+  },
 ];
 
 export default function AgentManagementPage() {
   const [tab, setTab] = useState<"enabled" | "all">("enabled");
   const [quickFilter, setQuickFilter] = useState("");
   const gridRef = useRef<AgGridReactType>(null);
-  const [selectedAgent, setSelectedAgent] = useState<any | null>(null);
 
   // Show only enabled agents for the "Enabled Agents" tab
   const agents = tab === "enabled"
@@ -86,9 +137,6 @@ export default function AgentManagementPage() {
     : allAgents; // Show all for "All Employees"
 
   const columnDefs = tab === "enabled" ? enabledColumnDefs : allEmployeesColumnDefs;
-
-  // AG Grid context for passing callbacks
-  const gridContext = tab === "enabled" ? { onViewDetails: (agent: any) => setSelectedAgent(selectedAgent && selectedAgent.repId === agent.repId ? null : agent), selectedAgent } : {};
 
   return (
     <main
@@ -126,6 +174,7 @@ export default function AgentManagementPage() {
         <div
           className="ag-theme-quartz"
           style={{
+            height: 400,
             width: "100%",
             "--ag-background-color": "#fff",
             "--ag-header-background-color": "#fff",
@@ -140,32 +189,8 @@ export default function AgentManagementPage() {
             columnDefs={columnDefs}
             quickFilterText={quickFilter}
             domLayout="autoHeight"
-            context={gridContext}
-            suppressRowClickSelection={true}
-            rowSelection="single"
           />
         </div>
-
-        {/* Show agent details below the selected row for Enabled Agents tab */}
-        {tab === "enabled" && selectedAgent && (
-          <div className="mt-4 border rounded bg-white p-6">
-            <h3 className="font-bold mb-2">Agent Details</h3>
-            <div className="grid grid-cols-2 gap-2 mb-4">
-              <div><strong>Name:</strong> {selectedAgent.name}</div>
-              <div><strong>Username:</strong> {selectedAgent.username}</div>
-              <div><strong>Rep ID:</strong> {selectedAgent.repId}</div>
-              <div><strong>Department:</strong> {selectedAgent.department}</div>
-              <div><strong>Status:</strong> <span className="text-green-600 font-bold">Active</span></div>
-              <div><strong>Position:</strong> {selectedAgent.position || "-"}</div>
-              <div><strong>Aleo Address:</strong> <span className="text-green-700 font-mono">{selectedAgent.aleoAddress || "aleo1..."}</span></div>
-              <div><strong>OTP Digits:</strong> {selectedAgent.otpDigits || 6}</div>
-              <div><strong>Enabled At:</strong> {selectedAgent.enabledAt || "-"}</div>
-            </div>
-            <button className="px-4 py-2 bg-red-500 text-white rounded mb-4">Revoke Agent Access</button>
-            <h4 className="font-bold mt-4 mb-2">Recent Activity</h4>
-            <div className="bg-blue-50 p-4 rounded">No recent activity found for this agent</div>
-          </div>
-        )}
       </div>
     </main>
   );
