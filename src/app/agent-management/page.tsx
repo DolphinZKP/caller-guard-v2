@@ -5,22 +5,12 @@ import { AgGridReact } from "ag-grid-react";
 import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
 import type { AgGridReact as AgGridReactType } from "ag-grid-react";
 import type { ColDef, ICellRendererParams, ValueGetterParams } from "ag-grid-community";
+import { agents as allAgents } from "@/utils/agents"; // adjust path as needed
 
 // Register AG Grid modules
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-const mockAgents = [
-  { name: 'Brown, James', username: 'JB127', repId: 'W7333', department: 'Technical Support', open: false, pay: false },
-  { name: 'Mitchell, Kevin', username: 'KM744', repId: 'B1921', department: 'Customer Support', open: false, pay: false },
-  { name: 'White, Timothy', username: 'TW175', repId: 'A4872', department: 'Sales', open: false, pay: false },
-];
-
-const mockEmployees = [
-  ...mockAgents,
-  { name: 'Moore, Linda', username: 'LM777', repId: 'S9194', department: 'Customer Support', open: true, pay: false },
-];
-
-const columnDefs: ColDef[] = [
+const enabledColumnDefs: ColDef[] = [
   { headerName: "Name", field: "name", flex: 1, cellClass: "ag-left-aligned-cell" },
   {
     headerName: "Username / Rep ID",
@@ -54,11 +44,37 @@ const columnDefs: ColDef[] = [
   },
 ];
 
+const allEmployeesColumnDefs: ColDef[] = [
+  { headerName: "Name", field: "name", flex: 1, cellClass: "ag-left-aligned-cell" },
+  {
+    headerName: "Username / Rep ID",
+    valueGetter: (p: ValueGetterParams) => `${p.data.username} (${p.data.repId})`,
+    flex: 1,
+    cellClass: "ag-left-aligned-cell",
+  },
+  { headerName: "Department", field: "department", flex: 1, cellClass: "ag-left-aligned-cell" },
+  {
+    headerName: "Status",
+    field: "enabled",
+    flex: 1,
+    cellRenderer: (p: ICellRendererParams) => (
+      p.value ? <span className="text-green-600 font-bold">Yes</span> : <span className="text-red-600 font-bold">No</span>
+    ),
+    cellClass: "ag-left-aligned-cell",
+  },
+];
+
 export default function AgentManagementPage() {
   const [tab, setTab] = useState<"enabled" | "all">("enabled");
   const [quickFilter, setQuickFilter] = useState("");
   const gridRef = useRef<AgGridReactType>(null);
-  const agents = tab === "enabled" ? mockAgents : mockEmployees;
+
+  // Show only enabled agents for the "Enabled Agents" tab
+  const agents = tab === "enabled"
+    ? allAgents.filter(agent => agent.enabled)
+    : allAgents; // Show all for "All Employees"
+
+  const columnDefs = tab === "enabled" ? enabledColumnDefs : allEmployeesColumnDefs;
 
   return (
     <main
