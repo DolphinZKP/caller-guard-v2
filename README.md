@@ -1,85 +1,92 @@
-# NextAdmin - Next.js Admin Dashboard Template and Components
+# ZK Caller Verification System (Next.js Frontend)
 
-**NextAdmin** is a Free, open-source Next.js admin dashboard toolkit featuring 200+ UI components and templates that come with pre-built elements, components, pages, high-quality design, integrations, and much more to help you create powerful admin dashboards with ease.
+> **Note:** This is the **second iteration** of the ZK Caller Verification System. The original version (Python/Streamlit) can be found here: [DolphinZKP/caller-guard](https://github.com/DolphinZKP/caller-guard)
 
+A secure identity verification system for call centers using zero-knowledge proofs on the blockchain. This Next.js frontend provides a robust, modern admin dashboard for managing agent identities, badge minting, and real-time verification, all while maintaining privacy and leveraging Aleo blockchain technology.
 
-[![nextjs admin template](https://cdn.pimjo.com/nextadmin-2.png)](https://nextadmin.co/)
+## System Overview
 
+The ZK Caller Verification System implements a secure, decentralized approach to call center agent verification using zero-knowledge proofs. This ensures that:
 
-**NextAdmin** provides you with a diverse set of dashboard UI components, elements, examples and pages necessary for creating top-notch admin panels or dashboards with **powerful** features and integrations. Whether you are working on a complex web application or a basic website, **NextAdmin** has got you covered.
+- Agent identities are securely verified without exposing sensitive information
+- Each verification is cryptographically secure and tamper-proof
+- The system maintains privacy while providing strong authentication
+- Verification can be performed in real-time during calls
 
-### [✨ Visit Website](https://nextadmin.co/)
-### [🚀 Live Demo](https://demo.nextadmin.co/)
-### [📖 Docs](https://docs.nextadmin.co/)
+## Key Features
 
-By leveraging the latest features of **Next.js 14** and key functionalities like **server-side rendering (SSR)**, **static site generation (SSG)**, and seamless **API route integration**, **NextAdmin** ensures optimal performance. With the added benefits of **React 18 advancements** and **TypeScript** reliability, **NextAdmin** is the ultimate choice to kickstart your **Next.js** project efficiently.
+- **Next.js 14 Frontend:** Modern, responsive admin dashboard UI
+- **Aleo Blockchain Integration:** Secure agent identity verification using zero-knowledge proofs
+- **One-time Verification Codes:** Unique, time-limited codes for secure caller authentication
+- **HR Management Portal:** Streamlined interface for managing agent verification and permissions
+- **Real-time Verification:** Instant verification of agent identity during calls
+- **Privacy-Preserving:** Zero-knowledge proofs ensure sensitive data remains private
+- **Role-based Access:** HR/Admin and Agent dashboards
+- **Beautiful UI:** Built with Tailwind CSS and React
 
-## Installation
-
-1. Download/fork/clone the repo and Once you're in the correct directory, it's time to install all the necessary dependencies. You can do this by typing the following command:
+## Project Structure
 
 ```
+/src
+  /app
+    /hr-admin         # HR admin dashboard and badge minting
+    /agent-dashboard  # Agent dashboard for OTP generation
+    /agent-management # Agent management and permissions
+    /auth             # Authentication (sign-in, etc.)
+    /profile          # User profile and settings
+    ...
+  /components         # Reusable UI components
+  /assets             # Logos and images
+  /services           # API and blockchain service logic
+  /context            # React context for global state
+  /utils              # Utility functions
+/public
+  /images             # Static images (user avatars, logos, etc.)
+aleo/
+  /agent_manager      # Aleo program source (Leo)
+```
+
+## Quick Start
+
+### 1. Install dependencies
+
+```sh
 npm install
-```
-If you're using **Yarn** as your package manager, the command will be:
-
-```
+# or
 yarn install
 ```
 
-2. Okay, you're almost there. Now all you need to do is start the development server. If you're using **npm**, the command is:
+### 2. Run the Next.js frontend
 
-```
+```sh
 npm run dev
-```
-And if you're using **Yarn**, it's:
-
-```
+# or
 yarn dev
 ```
 
-And voila! You're now ready to start developing. **Happy coding**!
+The app will be available at [http://localhost:3000](http://localhost:3000).
 
-## Highlighted Features
-**200+ Next.js Dashboard Ul Components and Templates** - includes a variety of prebuilt **Ul elements, components, pages, and examples** crafted with a high-quality design.
-Additionally, features seamless **essential integrations and extensive functionalities**.
+## Aleo Blockchain Integration
 
-- A library of over **200** professional dashboard UI components and elements.
-- Five distinctive dashboard variations, catering to diverse use-cases.
-- A comprehensive set of essential dashboard and admin pages.
-- More than **45** **Next.js** files, ready for use.
-- Styling facilitated by **Tailwind CSS** files.
-- A design that resonates premium quality and high aesthetics.
-- A handy UI kit with assets.
-- Over ten web apps complete with examples.
-- Support for both **dark mode** and **light mode**.
-- Essential integrations including - Authentication (**NextAuth**), Database (**Postgres** with **Prisma**), and Search (**Algolia**).
-- Detailed and user-friendly documentation.
-- Customizable plugins and add-ons.
-- **TypeScript** compatibility.
-- Plus, much more!
+- The Aleo program source is in `aleo/agent_manager/src/main.leo`
+- The frontend interacts with the Aleo blockchain via the Aleo JS SDK (see `/src/app/hr-admin/worker.ts`)
+- Badge minting and agent verification are performed using zero-knowledge proofs
 
-All these features and more make **NextAdmin** a robust, well-rounded solution for all your dashboard development needs.
+## Application Tabs
 
-## Update Logs
+- **HR Admin:** Enable call center employees as verified agents by minting blockchain identity badges
+- **Agent Dashboard:** View agent details and generate one-time verification codes
+- **Agent Management:** Manage existing agent accounts and permissions
+- **Profile/Settings:** Edit user info and upload profile photo
 
-### Version 1.2.1 - [Mar 20, 2025]
-- Fix Peer dependency issues and NextConfig warning.
-- Updated apexcharts and react-apexhcarts to the latest version.
+## Development
 
-### Version 1.2.0 - Major Upgrade and UI Improvements - [Jan 27, 2025]
+- All frontend code is in `/src`
+- Aleo/Leo code is in `/aleo`
+- Static assets are in `/public/images`
 
-- Upgraded to Next.js v15 and updated dependencies
-- API integration with loading skeleton for tables and charts.
-- Improved code structure for better readability.
-- Rebuilt components like dropdown, sidebar, and all ui-elements using accessibility practices.
-- Using search-params to store dropdown selection and refetch data.
-- Semantic markups, better separation of concerns and more.
+**Note:** This is the Next.js frontend for the ZK Caller Verification System. The backend, database, and blockchain logic are managed separately (see `/aleo` for Leo/Aleo code).
 
-### Version 1.1.0
-- Updated Dependencies
-- Removed Unused Integrations
-- Optimized App
+## License
 
-### Version 1.0
-- Initial Release - [May 13, 2024]
+MIT

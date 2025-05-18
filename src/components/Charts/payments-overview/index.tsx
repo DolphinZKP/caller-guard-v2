@@ -24,7 +24,7 @@ export async function PaymentsOverview({
     >
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h2 className="text-body-2xlg font-bold text-dark dark:text-white">
-          Payments Overview
+          OTPs Generated
         </h2>
 
         <PeriodPicker defaultValue={timeFrame} sectionKey="payments_overview" />
@@ -35,16 +35,16 @@ export async function PaymentsOverview({
       <dl className="grid divide-stroke text-center dark:divide-dark-3 sm:grid-cols-2 sm:divide-x [&>div]:flex [&>div]:flex-col-reverse [&>div]:gap-1">
         <div className="dark:border-dark-3 max-sm:mb-3 max-sm:border-b max-sm:pb-3">
           <dt className="text-xl font-bold text-dark dark:text-white">
-            ${standardFormat(data.received.reduce((acc, { y }) => acc + y, 0))}
+            {data.received.reduce((acc, { y }) => acc + y, 0).toLocaleString()}
           </dt>
-          <dd className="font-medium dark:text-dark-6">Received Amount</dd>
+          <dd className="font-medium dark:text-dark-6">Total Successful OTPs</dd>
         </div>
 
         <div>
           <dt className="text-xl font-bold text-dark dark:text-white">
-            ${standardFormat(data.due.reduce((acc, { y }) => acc + y, 0))}
+            {data.due.reduce((acc, { y }) => acc + y, 0).toLocaleString()}
           </dt>
-          <dd className="font-medium dark:text-dark-6">Due Amount</dd>
+          <dd className="font-medium dark:text-dark-6">Total Failed OTPs</dd>
         </div>
       </dl>
     </div>

@@ -41,16 +41,7 @@ export const NAV_DATA = [
         icon: Icons.User,
         items: [],
       },
-      {
-        title: "Pages",
-        icon: Icons.Alphabet,
-        items: [
-          {
-            title: "Settings",
-            url: "/pages/settings",
-          },
-        ],
-      },
+
       {
         title: "Authentication",
         icon: Icons.Authentication,

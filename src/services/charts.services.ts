@@ -42,51 +42,50 @@ export async function getPaymentsOverviewData(
   if (timeFrame === "yearly") {
     return {
       received: [
-        { x: 2020, y: 450 },
-        { x: 2021, y: 620 },
-        { x: 2022, y: 780 },
-        { x: 2023, y: 920 },
-        { x: 2024, y: 1080 },
+        { x: 2020, y: 900 },
+        { x: 2021, y: 1100 },
+        { x: 2022, y: 1300 },
+        { x: 2023, y: 1400 },
+        { x: 2024, y: 1500 },
       ],
       due: [
-        { x: 2020, y: 1480 },
-        { x: 2021, y: 1720 },
-        { x: 2022, y: 1950 },
-        { x: 2023, y: 2300 },
-        { x: 2024, y: 1200 },
+        { x: 2020, y: 360 }, // 40% of 900
+        { x: 2021, y: 440 }, // 40% of 1100
+        { x: 2022, y: 520 }, // 40% of 1300
+        { x: 2023, y: 560 }, // 40% of 1400
+        { x: 2024, y: 600 }, // 40% of 1500
       ],
     };
   }
 
+  // Monthly data
+  const received = [
+    { x: "Jan", y: 850 },
+    { x: "Feb", y: 900 },
+    { x: "Mar", y: 950 },
+    { x: "Apr", y: 1000 },
+    { x: "May", y: 1100 },
+    { x: "Jun", y: 1200 },
+    { x: "Jul", y: 1300 },
+    { x: "Aug", y: 1400 },
+    { x: "Sep", y: 1450 },
+    { x: "Oct", y: 1350 },
+    { x: "Nov", y: 1250 },
+    { x: "Dec", y: 1200 }, // Last month is 1200
+  ];
+
+  // Due is 30-50% of received, and received is at least 60% more than due most of the time
+  const due = received.map((item, idx) => {
+    // 30% for most, 50% for a couple of months
+    let percent = 0.3;
+    if (idx === 2 || idx === 8) percent = 0.5; // Mar, Sep
+    const y = Math.round(item.y * percent);
+    return { x: item.x, y };
+  });
+
   return {
-    received: [
-      { x: "Jan", y: 0 },
-      { x: "Feb", y: 20 },
-      { x: "Mar", y: 35 },
-      { x: "Apr", y: 45 },
-      { x: "May", y: 35 },
-      { x: "Jun", y: 55 },
-      { x: "Jul", y: 65 },
-      { x: "Aug", y: 50 },
-      { x: "Sep", y: 65 },
-      { x: "Oct", y: 75 },
-      { x: "Nov", y: 60 },
-      { x: "Dec", y: 75 },
-    ],
-    due: [
-      { x: "Jan", y: 15 },
-      { x: "Feb", y: 9 },
-      { x: "Mar", y: 17 },
-      { x: "Apr", y: 32 },
-      { x: "May", y: 25 },
-      { x: "Jun", y: 68 },
-      { x: "Jul", y: 80 },
-      { x: "Aug", y: 68 },
-      { x: "Sep", y: 84 },
-      { x: "Oct", y: 94 },
-      { x: "Nov", y: 74 },
-      { x: "Dec", y: 62 },
-    ],
+    received,
+    due,
   };
 }
 

@@ -10,31 +10,32 @@ import {
 // Initialize the thread pool for Aleo operations
 await initThreadPool();
 
-// Define your Aleo program for minting agent badges
-const mint_agent_program = `
-program mint_agent.aleo;
-
-function mint_badge:
-    input r0 as field.public;  // rep_id
-    input r1 as field.public;  // bank_name
-    output r0 as field.private;
-    output r1 as field.private;
-`;
-
 async function mintAgent(repId: string, bankName: string) {
   try {
-    const programManager = new ProgramManager(undefined, undefined, undefined);
+    const programManager = new ProgramManager("https://vm.aleo.org/api");
     
     // Create a temporary account for the execution
     const account = new Account();
     programManager.setAccount(account);
 
-    // Execute the program
+    // Use your deployed program ID and transition name
+    const programId = "agent_manager.aleo"; // <-- update if your program ID is different
+    const transition = "mint_agent";
+
+    // Arguments: repId and bankName (already hashed to field)
+    // Format inputs as "{value}field.private"
+    const inputs = [
+      `${repId}field`,
+      `${bankName}field`
+    ];
+
+    console.log("Formatted inputs for SDK:", inputs); // Added for debugging
+
     const executionResponse = await programManager.run(
-      mint_agent_program,
-      "mint_badge",
-      [repId, bankName],
-      false
+      programId,
+      transition,
+      inputs, // Use the formatted inputs
+      true    // Auto-estimate and pay fee
     );
 
     return {
@@ -44,7 +45,9 @@ async function mintAgent(repId: string, bankName: string) {
       outputs: executionResponse.getOutputs()
     };
   } catch (error) {
-    console.error("Error minting agent:", error);
+    console.error("Error minting agent:", error, typeof error);
+    // Log the arguments that caused the error
+    console.error("Failed with inputs:", { repId, bankName, formattedInputs: [`${repId}field`, `${bankName}field`] }); 
     return {
       status: "error",
       repId,
@@ -67,9 +70,14 @@ onmessage = async function (e) {
       });
     }
   } catch (error) {
+    console.error("Worker error:", error, typeof error);
     postMessage({
       type: "error",
       error: error instanceof Error ? error.message : String(error)
     });
   }
 };
+
+function hexToDecimal(hexStr: string): string {
+  return BigInt('0x' + hexStr).toString(10);
+}

@@ -8,7 +8,7 @@ export function UploadPhotoForm() {
       <form>
         <div className="mb-4 flex items-center gap-3">
           <Image
-            src="/images/user/user-03.png"
+            src="/images/user/user-02.png"
             width={55}
             height={55}
             alt="User"

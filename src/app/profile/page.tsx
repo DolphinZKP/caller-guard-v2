@@ -9,8 +9,8 @@ import { SocialAccounts } from "./_components/social-accounts";
 
 export default function Page() {
   const [data, setData] = useState({
-    name: "Danish Heilium",
-    profilePhoto: "/images/user/user-03.png",
+    name: "Angel Lim",
+    profilePhoto: "/images/user/user-02.png",
     coverPhoto: "/images/cover/cover-01.png",
   });
 
@@ -137,11 +137,7 @@ export default function Page() {
                 About Me
               </h4>
               <p className="mt-4">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                Pellentesque posuere fermentum urna, eu condimentum mauris
-                tempus ut. Donec fermentum blandit aliquet. Etiam dictum dapibus
-                ultricies. Sed vel aliquet libero. Nunc a augue fermentum,
-                pharetra ligula sed, aliquam lacus.
+              Angel is an experienced HR Specialist at OKO Bank with over 8 years of expertise in human resources management. Her career spans recruitment, employee relations, and organizational development, with a proven track record of enhancing employee engagement and optimizing HR processes. At OKO Bank, Angel plays a key role in talent acquisition, conflict resolution, and driving initiatives to improve workplace culture. Her strategic approach to HR, combined with her strong knowledge of labor laws and compliance, ensures that the bank’s workforce is both motivated and aligned with organizational goals.
               </p>
             </div>
 

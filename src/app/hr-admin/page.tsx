@@ -5,10 +5,26 @@ import dynamic from 'next/dynamic';
 import { SingleValue } from 'react-select';
 import { useAgentContext } from '@/context/AgentContext';
 import type { Agent } from '@/utils/agents';
+import { ProgramManager } from '@aleohq/sdk';
 
 const Select = dynamic(() => import('react-select'), { ssr: false });
 
 type OptionType = { value: string; label: string };
+
+
+// Hash a string to a 32-byte hex string (Aleo field)
+async function stringToAleoField(str: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(str);
+  const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+function hexToDecimal(hexStr: string): string {
+  return BigInt('0x' + hexStr).toString(10);
+}
 
 export default function HrAdminPage() {
   const { agents, enableAgent } = useAgentContext();
@@ -31,18 +47,17 @@ export default function HrAdminPage() {
     setShowConfirm(true);
   };
 
-  const confirmMint = () => {
+  const confirmMint = async () => {
     if (employee) {
+      // Hash to Aleo field format
+      const repIdField = hexToDecimal(await stringToAleoField(employee.repId))+"field";
+      const bankNameField = hexToDecimal(await stringToAleoField(employee.department))+"field";
+
       enableAgent(employee.repId);
-      console.log("Sending message to worker:", {
-        type: "mint_agent",
-        rep_id: employee.repId,
-        bank_name: employee.department,
-      });
       workerRef.current?.postMessage({
         type: "mint_agent",
-        rep_id: employee.repId,
-        bank_name: employee.department,
+        rep_id: repIdField,      // <-- decimal string (correct for SDK)
+        bank_name: bankNameField // <-- decimal string (correct for SDK)
       });
     }
     setShowConfirm(false);
@@ -56,7 +71,8 @@ export default function HrAdminPage() {
     workerRef.current = new Worker(new URL("./worker.ts", import.meta.url), { type: "module" });
     workerRef.current.onmessage = (event) => {
       if (event.data.type === "mint_agent") {
-        alert(`Minted agent: ${JSON.stringify(event.data.result)}`);
+        console.log(`Minted agent: ${JSON.stringify(event.data.result)}`);
+        //alert(`Minted agent: ${JSON.stringify(event.data.result)}`);
       }
     };
     console.log("Worker script loaded!");

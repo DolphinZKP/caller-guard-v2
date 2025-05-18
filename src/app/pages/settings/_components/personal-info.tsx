@@ -18,8 +18,8 @@ export function PersonalInfoForm() {
             type="text"
             name="fullName"
             label="Full Name"
-            placeholder="David Jhon"
-            defaultValue="David Jhon"
+            placeholder="Angel Lim"
+            defaultValue="Angel Lim"
             icon={<UserIcon />}
             iconPosition="left"
             height="sm"
@@ -43,8 +43,8 @@ export function PersonalInfoForm() {
           type="email"
           name="email"
           label="Email Address"
-          placeholder="devidjond45@gmail.com"
-          defaultValue="devidjond45@gmail.com"
+          placeholder="angellim@callerguard.com"
+          defaultValue="angellim@callerguard.com"
           icon={<EmailIcon />}
           iconPosition="left"
           height="sm"
@@ -55,8 +55,8 @@ export function PersonalInfoForm() {
           type="text"
           name="username"
           label="Username"
-          placeholder="devidjhon24"
-          defaultValue="devidjhon24"
+          placeholder="angelhr_okobank"
+          defaultValue="angelhr_okobank"
           icon={<UserIcon />}
           iconPosition="left"
           height="sm"
@@ -67,8 +67,8 @@ export function PersonalInfoForm() {
           label="BIO"
           placeholder="Write your bio here"
           icon={<PencilSquareIcon />}
-          defaultValue="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam lacinia turpis tortor, consequat efficitur mi congue a. Curabitur cursus, ipsum ut lobortis sodales, enim arcu pellentesque lectus ac suscipit diam sem a felis. Cras sapien ex, blandit eu dui et suscipit gravida nunc. Sed sed est quis dui."
-        />
+          defaultValue="Angel is an experienced HR Specialist at OKO Bank with over 8 years of expertise in human resources management. Her career spans recruitment, employee relations, and organizational development, with a proven track record of enhancing employee engagement and optimizing HR processes. At OKO Bank, Angel plays a key role in talent acquisition, conflict resolution, and driving initiatives to improve workplace culture. Her strategic approach to HR, combined with her strong knowledge of labor laws and compliance, ensures that the bank’s workforce is both motivated and aligned with organizational goals."        
+          />
 
         <div className="flex justify-end gap-3">
           <button
