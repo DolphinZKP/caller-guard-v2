@@ -1,6 +1,6 @@
 # ZK Caller Verification System (Next.js Frontend)
 
-> **Note:** This is the **second iteration** of the ZK Caller Verification System. The original version (Python/Streamlit) can be found here: [DolphinZKP/caller-guard](https://github.com/DolphinZKP/caller-guard)
+> **Note:** This is the **second iteration** of the ZK Caller Verification System. The original version (Python/Streamlit) can be found here: [DolphinZKP/caller-guard](https://github.com/DolphinZKP/caller-guard). It was created before deadline extension.
 
 A secure identity verification system for call centers using zero-knowledge proofs on the blockchain. This Next.js frontend provides a robust, modern admin dashboard for managing agent identities, badge minting, and real-time verification, all while maintaining privacy and leveraging Aleo blockchain technology.
 
@@ -43,6 +43,10 @@ Below are screenshots of the main UI screens:
 ### Agent OTP Generator
 
 ![Agent OTP Generator](./4_UI_OTP_generation.png)
+
+### Backend Design
+
+![Design](./Backend.png)
 
 ## Project Structure
 

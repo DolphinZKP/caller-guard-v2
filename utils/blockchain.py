@@ -62,14 +62,14 @@ def blockchain_call(program_name, function_name, inputs, project_path=None,
         except:
             pass
 
-def extract_leo_output(raw_output):
-    """
-    Extracts the output record (the curly-brace block) from Leo CLI output.
-    Returns the record as a string, or None if not found.
-    """
-    # Find the "Output" section and the first curly-brace block after it
-    match = re.search(r"Output\s*\n\s*•\s*({.*?})", raw_output, re.DOTALL)
-    if match:
-        record_str = match.group(1)
-        return record_str.strip()
-    return None
+# def extract_leo_output(raw_output):
+#     """
+#     Extracts the output record (the curly-brace block) from Leo CLI output.
+#     Returns the record as a string, or None if not found.
+#     """
+#     # Find the "Output" section and the first curly-brace block after it
+#     match = re.search(r"Output\s*\n\s*•\s*({.*?})", raw_output, re.DOTALL)
+#     if match:
+#         record_str = match.group(1)
+#         return record_str.strip()
+#     return None

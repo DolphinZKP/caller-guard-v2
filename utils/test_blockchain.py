@@ -7,7 +7,7 @@ import json
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import the blockchain_call function
-from utils.blockchain import blockchain_call
+from blockchain import blockchain_call
 
 def test_local_execution():
     """Test locally executing a function"""
