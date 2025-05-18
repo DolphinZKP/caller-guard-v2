@@ -24,6 +24,26 @@ The ZK Caller Verification System implements a secure, decentralized approach to
 - **Role-based Access:** HR/Admin and Agent dashboards
 - **Beautiful UI:** Built with Tailwind CSS and React
 
+## UI Screenshots
+
+Below are screenshots of the main UI screens:
+
+### Main Dashboard (Analytics)
+
+![Dashboard Analytics](./1_UI_dashboard.png)
+
+### HR Mint Badge
+
+![HR Mint Badge](./2_UI_mint_badge.png)
+
+### HR Agent Management
+
+![HR Agent Management](./3_UI_Agent_Management.png)
+
+### Agent OTP Generator
+
+![Agent OTP Generator](./4_UI_OTP_generation.png)
+
 ## Project Structure
 
 ```
