@@ -12,6 +12,18 @@ export const NAV_DATA = [
             title: "eCommerce",
             url: "/",
           },
+          {
+            title: "Agent Management",
+            url: "/agent-management",
+          },
+          {
+            title: "Agent Dashboard",
+            url: "/agent-dashboard",
+          },
+          {
+            title: "HR Admin",
+            url: "/hr-admin",
+          },
         ],
       },
       {
