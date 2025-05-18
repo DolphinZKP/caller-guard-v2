@@ -15,7 +15,7 @@ The ZK Caller Verification System implements a secure, decentralized approach to
 
 ## Key Features
 
-- **Next.js 14 Frontend:** Modern, responsive admin dashboard UI
+- **Next.js 14 Frontend:** Modern, responsive admin dashboard UI (specifically piggyback on nextjs-admin and aleohq sdk for typescripts)
 - **Aleo Blockchain Integration:** Secure agent identity verification using zero-knowledge proofs
 - **One-time Verification Codes:** Unique, time-limited codes for secure caller authentication
 - **HR Management Portal:** Streamlined interface for managing agent verification and permissions
