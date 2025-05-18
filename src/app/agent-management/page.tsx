@@ -1,70 +1,119 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from "react";
+import { AgGridReact } from "ag-grid-react";
+import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
+import type { AgGridReact as AgGridReactType } from "ag-grid-react";
+import type { ColDef, ICellRendererParams, ValueGetterParams } from "ag-grid-community";
+
+// Register AG Grid modules
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 const mockAgents = [
-  { name: 'Brown, James', username: 'JB127', repId: 'W7333', department: 'Technical Support', permissions: { open: false, pay: false } },
-  { name: 'Mitchell, Kevin', username: 'KM744', repId: 'B1921', department: 'Customer Support', permissions: { open: false, pay: false } },
-  { name: 'White, Timothy', username: 'TW175', repId: 'A4872', department: 'Sales', permissions: { open: false, pay: false } },
+  { name: 'Brown, James', username: 'JB127', repId: 'W7333', department: 'Technical Support', open: false, pay: false },
+  { name: 'Mitchell, Kevin', username: 'KM744', repId: 'B1921', department: 'Customer Support', open: false, pay: false },
+  { name: 'White, Timothy', username: 'TW175', repId: 'A4872', department: 'Sales', open: false, pay: false },
 ];
 
 const mockEmployees = [
   ...mockAgents,
-  { name: 'Moore, Linda', username: 'LM777', repId: 'S9194', department: 'Customer Support', permissions: { open: true, pay: false } },
+  { name: 'Moore, Linda', username: 'LM777', repId: 'S9194', department: 'Customer Support', open: true, pay: false },
+];
+
+const columnDefs: ColDef[] = [
+  { headerName: "Name", field: "name", flex: 1, cellClass: "ag-left-aligned-cell" },
+  {
+    headerName: "Username / Rep ID",
+    valueGetter: (p: ValueGetterParams) => `${p.data.username} (${p.data.repId})`,
+    flex: 1,
+    cellClass: "ag-left-aligned-cell",
+  },
+  { headerName: "Department", field: "department", flex: 1, cellClass: "ag-left-aligned-cell" },
+  {
+    headerName: "Open",
+    field: "open",
+    flex: 0.5,
+    cellRenderer: (p: ICellRendererParams) => (p.value ? "✅" : "❌"),
+    cellClass: "ag-left-aligned-cell",
+  },
+  {
+    headerName: "Pay",
+    field: "pay",
+    flex: 0.5,
+    cellRenderer: (p: ICellRendererParams) => (p.value ? "✅" : "❌"),
+    cellClass: "ag-left-aligned-cell",
+  },
+  {
+    headerName: "Actions",
+    field: "actions",
+    flex: 1,
+    cellRenderer: () => (
+      <button className="px-2 py-1 bg-blue-100 rounded">View Details</button>
+    ),
+    cellClass: "ag-left-aligned-cell",
+  },
 ];
 
 export default function AgentManagementPage() {
-  const [tab, setTab] = useState<'enabled' | 'all'>('enabled');
-  const [search, setSearch] = useState('');
-  const agents = tab === 'enabled' ? mockAgents : mockEmployees;
-
-  // Filter agents by search term (name, username, repId, etc.)
-  const filteredAgents = agents.filter(agent =>
-    agent.name.toLowerCase().includes(search.toLowerCase()) ||
-    agent.username.toLowerCase().includes(search.toLowerCase()) ||
-    agent.repId.toLowerCase().includes(search.toLowerCase())
-  );
+  const [tab, setTab] = useState<"enabled" | "all">("enabled");
+  const [quickFilter, setQuickFilter] = useState("");
+  const gridRef = useRef<AgGridReactType>(null);
+  const agents = tab === "enabled" ? mockAgents : mockEmployees;
 
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4">Agent Management</h1>
+    <main
+      style={{
+        backgroundColor: "#ffffff",
+        minHeight: "100vh",
+      }}
+    >
+      <h1 className="text-2xl font-bold mb-4 text-left">Agent Management</h1>
+
       <div className="flex gap-4 mb-4">
-        <button className={tab === 'enabled' ? 'font-bold border-b-2 border-blue-500' : ''} onClick={() => setTab('enabled')}>Enabled Agents</button>
-        <button className={tab === 'all' ? 'font-bold border-b-2 border-blue-500' : ''} onClick={() => setTab('all')}>All Employees</button>
+        <button
+          className={`text-left ${tab === "enabled" ? "font-bold border-b-2 border-blue-500" : ""}`}
+          onClick={() => setTab("enabled")}
+        >
+          Enabled Agents
+        </button>
+        <button
+          className={`text-left ${tab === "all" ? "font-bold border-b-2 border-blue-500" : ""}`}
+          onClick={() => setTab("all")}
+        >
+          All Employees
+        </button>
       </div>
-      <input
-        type="text"
-        placeholder="Search employees..."
-        value={search}
-        onChange={e => setSearch(e.target.value)}
-        className="mb-4 p-2 border rounded w-1/3"
-      />
-      <table className="min-w-full border">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="p-2 border">Name</th>
-            <th className="p-2 border">Username / Rep ID</th>
-            <th className="p-2 border">Department</th>
-            <th className="p-2 border">Permissions</th>
-            <th className="p-2 border">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredAgents.map((agent, idx) => (
-            <tr key={idx} className="text-center">
-              <td className="p-2 border">{agent.name}</td>
-              <td className="p-2 border">{agent.username} ({agent.repId})</td>
-              <td className="p-2 border">{agent.department}</td>
-              <td className="p-2 border">
-                Open: {agent.permissions.open ? '✅' : '❌'} Pay: {agent.permissions.pay ? '✅' : '❌'}
-              </td>
-              <td className="p-2 border">
-                <button className="px-2 py-1 bg-blue-100 rounded">View Details</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+
+      <div className="bg-transparent rounded-xl p-6 w-full">
+        <input
+          type="text"
+          placeholder="Search employees..."
+          value={quickFilter}
+          onChange={(e) => setQuickFilter(e.target.value)}
+          className="mb-4 p-2 border rounded w-1/3 text-left"
+        />
+
+        <div
+          className="ag-theme-quartz"
+          style={{
+            height: 400,
+            width: "100%",
+            "--ag-background-color": "#fff",
+            "--ag-header-background-color": "#fff",
+            "--ag-odd-row-background-color": "#fff",
+            "--ag-row-border-color": "rgb(239, 239, 240)",
+            "--ag-header-column-separator-display": "none",
+          } as React.CSSProperties}
+        >
+          <AgGridReact
+            ref={gridRef}
+            rowData={agents}
+            columnDefs={columnDefs}
+            quickFilterText={quickFilter}
+            domLayout="autoHeight"
+          />
+        </div>
+      </div>
+    </main>
   );
-} 
+}

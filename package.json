@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@provablehq/sdk": "^0.9.0",
+    "ag-grid-community": "^33.3.0",
+    "ag-grid-react": "^33.3.0",
     "apexcharts": "^4.5.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
