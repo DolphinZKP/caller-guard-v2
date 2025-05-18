@@ -5,7 +5,7 @@ import { AgGridReact } from "ag-grid-react";
 import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
 import type { AgGridReact as AgGridReactType } from "ag-grid-react";
 import type { ColDef, ICellRendererParams, ValueGetterParams } from "ag-grid-community";
-import { agents as allAgents } from "@/utils/agents"; // adjust path as needed
+import { useAgentContext } from '@/context/AgentContext';
 import AgentDetailsCell from "@/components/AgentDetailsCell";
 import { Account, ProgramManager, AleoNetworkClient, initializeWasm } from '@aleohq/sdk';
 
@@ -79,11 +79,12 @@ export default function AgentManagementPage() {
   const [quickFilter, setQuickFilter] = useState("");
   const gridRef = useRef<AgGridReactType>(null);
   const [selectedAgent, setSelectedAgent] = useState<any | null>(null);
+  const { agents, revokeAgent } = useAgentContext();
 
   // Show only enabled agents for the "Enabled Agents" tab
-  const agents = tab === "enabled"
-    ? allAgents.filter(agent => agent.enabled)
-    : allAgents; // Show all for "All Employees"
+  const filteredAgents = tab === "enabled"
+    ? agents.filter(agent => agent.enabled)
+    : agents;
 
   const columnDefs = tab === "enabled" ? enabledColumnDefs : allEmployeesColumnDefs;
 
@@ -136,7 +137,7 @@ export default function AgentManagementPage() {
         >
           <AgGridReact
             ref={gridRef}
-            rowData={agents}
+            rowData={filteredAgents}
             columnDefs={columnDefs}
             quickFilterText={quickFilter}
             domLayout="autoHeight"
@@ -161,7 +162,7 @@ export default function AgentManagementPage() {
               <div><strong>OTP Digits:</strong> {selectedAgent.otpDigits || 6}</div>
               <div><strong>Enabled At:</strong> {selectedAgent.enabledAt || "-"}</div>
             </div>
-            <button className="px-4 py-2 bg-red-500 text-white rounded mb-4">Revoke Agent Access</button>
+            <button className="px-4 py-2 bg-red-500 text-white rounded mb-4" onClick={() => { revokeAgent(selectedAgent.repId); setSelectedAgent(null); }}>Revoke Agent Access</button>
             <h4 className="font-bold mt-4 mb-2">Recent Activity</h4>
             <div className="bg-blue-50 p-4 rounded">No recent activity found for this agent</div>
           </div>

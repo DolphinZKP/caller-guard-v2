@@ -5,7 +5,7 @@ import { AgGridReact } from "ag-grid-react";
 import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
 import type { AgGridReact as AgGridReactType } from "ag-grid-react";
 import type { ColDef, ICellRendererParams, ValueGetterParams } from "ag-grid-community";
-import { agents as allAgents } from "@/utils/agents"; // adjust path as needed
+import { useAgentContext } from '@/context/AgentContext';
 
 // Register AG Grid modules
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -39,6 +39,7 @@ const enabledColumnDefs: ColDef[] = [
     flex: 1,
     cellRenderer: (params: ICellRendererParams) => {
       const [isExpanded, setIsExpanded] = useState(false);
+      const { revokeAgent } = useAgentContext();
       return (
         <div>
           <button
@@ -61,6 +62,7 @@ const enabledColumnDefs: ColDef[] = [
                   <div>• Take Payments: {params.data.permissions.pay ? "✅" : "❌"}</div>
                 </div>
               </div>
+              <button className="px-4 py-2 bg-red-500 text-white rounded mt-4" onClick={() => revokeAgent(params.data.repId)}>Revoke Agent Access</button>
             </div>
           )}
         </div>
@@ -94,6 +96,7 @@ const allEmployeesColumnDefs: ColDef[] = [
     flex: 1,
     cellRenderer: (params: ICellRendererParams) => {
       const [isExpanded, setIsExpanded] = useState(false);
+      const { revokeAgent } = useAgentContext();
       return (
         <div>
           <button
@@ -117,6 +120,7 @@ const allEmployeesColumnDefs: ColDef[] = [
                   <div>• Take Payments: {params.data.permissions.pay ? "✅" : "❌"}</div>
                 </div>
               </div>
+              <button className="px-4 py-2 bg-red-500 text-white rounded mt-4" onClick={() => revokeAgent(params.data.repId)}>Revoke Agent Access</button>
             </div>
           )}
         </div>
@@ -130,11 +134,12 @@ export default function AgentManagementPage() {
   const [tab, setTab] = useState<"enabled" | "all">("enabled");
   const [quickFilter, setQuickFilter] = useState("");
   const gridRef = useRef<AgGridReactType>(null);
+  const { agents, revokeAgent } = useAgentContext();
 
   // Show only enabled agents for the "Enabled Agents" tab
-  const agents = tab === "enabled"
-    ? allAgents.filter(agent => agent.enabled)
-    : allAgents; // Show all for "All Employees"
+  const filteredAgents = tab === "enabled"
+    ? agents.filter(agent => agent.enabled)
+    : agents;
 
   const columnDefs = tab === "enabled" ? enabledColumnDefs : allEmployeesColumnDefs;
 
@@ -185,7 +190,7 @@ export default function AgentManagementPage() {
         >
           <AgGridReact
             ref={gridRef}
-            rowData={agents}
+            rowData={filteredAgents}
             columnDefs={columnDefs}
             quickFilterText={quickFilter}
             domLayout="autoHeight"
