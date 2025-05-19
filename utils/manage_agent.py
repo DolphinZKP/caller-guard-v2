@@ -1,5 +1,5 @@
-from blockchain import blockchain_call
-import time
+from .blockchain import blockchain_call
+import datetime
 
 def mint_new_agent(rep_id, bank_name, project_path=None):
     """Create a new agent record on the blockchain"""
@@ -11,37 +11,38 @@ def mint_new_agent(rep_id, bank_name, project_path=None):
     )
     
     return {
-        "success": True,
-        "agent_id": result["outputs"][0] if "outputs" in result else None,
+        "status": "minted",
         "rep_id": rep_id,
-        "bank_name": bank_name
+        "bank_name": bank_name,
+        "timestamp":  datetime.now()
     }
 
-def revoke_agent(agent_id, rep_id, bank_name, project_path=None):
+def revoke_agent(rep_id, bank_name, project_path=None):
     """Revoke an agent's access"""
     result = blockchain_call(
         "agent_manager.aleo",
         "revoke_agent",
-        [agent_id],
+        [rep_id, bank_name],
         project_path=project_path
     )
     
     return {
-        "success": True,
-        "agent_id": agent_id,
-        "status": "revoked"
+        "status": "revoked",
+        "rep_id": rep_id,
+        "bank_name": bank_name,
+        "timestamp":  datetime.now()
     }
 
-def check_agent_status(agent_id, project_path=None):
+def check_agent_status(rep_id, project_path=None):
     """Check if an agent is active"""
     result = blockchain_call(
         "agent_manager.aleo",
         "is_agent_active",
-        [agent_id]
+        [rep_id]
     )
     
     return {
-        "agent_id": agent_id,
+        "agent_id": rep_id,
         "is_active": result["outputs"][0] if "outputs" in result else False
     }
 
