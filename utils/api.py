@@ -35,22 +35,32 @@ def read_root():
     return {"message": "API is running!"}
 
 @app.post("/mint_agent")
-def mint_agent(rep_id: str, bank_name: str):
-    result = mint_new_agent(rep_id, bank_name)
-
-    conn = get_db()
-    cur = conn.execute(
-        "SELECT department FROM agents WHERE rep_id = ? ORDER BY created_at DESC LIMIT 1",
-        (rep_id,)
-    )
-    row = cur.fetchone()
-    print("Department row:", row)
-    department = row["department"] if row and row["department"] else "Unknown"
-    print("Using department:", department)
-
-    # change agent table status to active
-    # change hr activities table action to mint
-    return {"message": result}
+def mint_agent(req: MintAgentRequest):
+    try:
+        rep_id = req.rep_id
+        bank_name = req.bank_name
+        performed_by = req.performed_by
+        result = mint_new_agent(rep_id, bank_name)
+        conn = get_db()
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        never_expire = "9999-12-31 23:59:59"
+        # Try to get department from previous records
+        cur = conn.execute(
+            "SELECT department FROM agents WHERE rep_id = ? ORDER BY created_at DESC LIMIT 1",
+            (rep_id,)
+        )
+        row = cur.fetchone()
+        department = row["department"] if row and row["department"] else "Unknown"
+        # Insert new agent record
+        conn.execute(
+            "INSERT INTO agents (rep_id, department, bank_name, status, created_at, expired_at) VALUES (?, ?, ?, ?, ?, ?)",
+            (rep_id, department, bank_name, "active", now, never_expire)
+        )
+        conn.commit()
+        conn.close()
+        return {"success": True, "message": f"Agent {rep_id} minted for {bank_name}", "department": department}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
 @app.post("/revoke_agent")
 def revoke_agent(rep_id: str, bank_name: str):
@@ -59,79 +69,6 @@ def revoke_agent(rep_id: str, bank_name: str):
     # change hr activities table action to mint
     return {"message": result}
 
-@app.get("/select_db")
-def select_db(table_name: str):
-    conn = get_db()
-    cur = conn.execute(f"SELECT * FROM {table_name}")
-    rows = cur.fetchall()
-    return {"message": rows}
-
-@app.post("/mint_agent")
-def mint_agent(req: MintAgentRequest):
-    print("Received request:", req)
-    # 1. Call blockchain
-    result = mint_new_agent(req.rep_id, req.bank_name)
-    print("Blockchain result:", result)
-    if not result["success"]:
-        raise HTTPException(status_code=400, detail="Minting failed")
-    # 2. Look up department for rep_id
-    conn = get_db()
-    cur = conn.execute(
-        "SELECT department FROM agents WHERE rep_id = ? ORDER BY created_at DESC LIMIT 1",
-        (req.rep_id,)
-    )
-    row = cur.fetchone()
-    print("Department row:", row)
-    department = row["department"] if row and row["department"] else "Unknown"
-    print("Using department:", department)
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    never_expire = "9999-12-31 23:59:59"
-    # 3. Write to agents table
-    try:
-        conn.execute(
-            "INSERT INTO agents (rep_id, department, bank_name, status, created_at, expired_at) VALUES (?, ?, ?, ?, ?, ?)",
-            (req.rep_id, department, req.bank_name, "active", now, never_expire)
-        )
-        print("Inserted into agents")
-    except Exception as e:
-        print("Error inserting into agents:", e)
-        raise
-    # 4. Write to hr_activities table
-    seed = 2345678901234567
-    try:
-        conn.execute(
-            "INSERT INTO hr_activities (action, rep_id, bank_name, performed_by, created_at, expired_at, seed) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            ("mint", req.rep_id, req.bank_name, req.performed_by, now, never_expire, seed)
-        )
-        print("Inserted into hr_activities")
-    except Exception as e:
-        print("Error inserting into hr_activities:", e)
-        raise
-    conn.commit()
-    conn.close()
-    print("Returning result:", result)
-    return result
-
-@app.post("/revoke_agent")
-def revoke_agent_api(req: RevokeAgentRequest):
-    result = revoke_agent(req.rep_id, req.rep_id, req.bank_name)
-    if not result["success"]:
-        raise HTTPException(status_code=400, detail="Revoke failed")
-    conn = get_db()
-    conn.execute(
-        "UPDATE agents SET status = ? WHERE rep_id = ? AND bank_name = ?",
-        ("revoked", req.rep_id, req.bank_name)
-    )
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    never_expire = "9999-12-31 23:59:59"
-    seed = 2345678901234567
-    conn.execute(
-        "INSERT INTO hr_activities (action, rep_id, bank_name, performed_by, created_at, expired_at, seed) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        ("revoke", req.rep_id, req.bank_name, req.performed_by, now, never_expire, seed)
-    )
-    conn.commit()
-    conn.close()
-    return result
 
 @app.post("/generate_otp")
 def generate_otp(req: OTPRequest):
